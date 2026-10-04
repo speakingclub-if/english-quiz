@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Speaking Club — Quick English Check</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#EAF2FF;--card:#fff;--ink:#1B2559;--mute:#5B6590;--acc:#FF6B8A;--ok:#1FA971;--bad:#E5484D;--line:#CBD7F2;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#121734;--card:#1C2250;--ink:#EEF1FF;--mute:#A7B0DD;--line:#343C78}}
+:root[data-theme="dark"]{--bg:#121734;--card:#1C2250;--ink:#EEF1FF;--mute:#A7B0DD;--line:#343C78}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'Nunito',system-ui,sans-serif;line-height:1.5}
+main{max-width:560px;margin:0 auto;padding:24px 16px 48px}
+h1{font-size:1.7rem;line-height:1.2;margin:8px 0 12px;font-weight:800}
+p{margin:0 0 14px}
+.card{background:var(--card);border-radius:20px;padding:22px;border:2px solid var(--line)}
+.mute{color:var(--mute);font-size:.95rem}
+button{font:inherit;cursor:pointer}
+button:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+.btn{background:var(--acc);color:#fff;border:0;border-radius:14px;padding:13px 22px;font-weight:800;font-size:1.05rem}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.ghost{background:transparent;color:var(--ink);border:2px solid var(--line);border-radius:14px;padding:10px 16px;font-weight:700}
+.bar{height:10px;background:var(--line);border-radius:99px;overflow:hidden;margin-bottom:6px}
+.bar i{display:block;height:100%;width:0;background:var(--acc);transition:width .3s}
+.tag{display:inline-block;font-weight:800;font-size:.9rem;color:var(--mute);margin-bottom:10px}
+.q{font-size:1.25rem;font-weight:800;margin:6px 0 16px}
+.opt{display:block;width:100%;text-align:left;background:var(--bg);color:var(--ink);border:2px solid var(--line);border-radius:14px;padding:13px 16px;margin-bottom:10px;font-weight:700}
+.opt:hover:not(:disabled){border-color:var(--acc)}
+.opt.ok{border-color:var(--ok);background:color-mix(in srgb,var(--ok) 18%,var(--card))}
+.opt.bad{border-color:var(--bad);background:color-mix(in srgb,var(--bad) 18%,var(--card))}
+.play{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:16px}
+.score{font-size:3.4rem;font-weight:800;line-height:1;margin:6px 0}
+.lvl{font-size:1.3rem;font-weight:800;color:var(--acc);margin-bottom:10px}
+.row{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px}
+[hidden]{display:none!important}
+@media (prefers-reduced-motion:reduce){.bar i{transition:none}}
+</style>
+</head>
+<body>
+<main>
+<section id="start" class="card">
+  <h1>Quick English check 🎧</h1>
+  <p>10 коротких питань: 5 на читання і 5 на слухання. Це не іспит і не EF SET — просто щоб побачити, де ти зараз, і підібрати комфортний формат для Speaking Club.</p>
+  <p class="mute">Займає ~5 хвилин. Для слухання ввімкни звук або одягни навушники. Помилки — наші друзі 🙂</p>
+  <button class="btn" id="go">Почати</button>
+</section>
+
+<section id="quiz" class="card" hidden>
+  <div class="bar"><i id="fill"></i></div>
+  <div class="tag" id="tag"></div>
+  <div id="listen" class="play" hidden>
+    <button class="btn" id="play">▶ Слухати</button>
+    <button class="ghost" id="slow">🐢 Повільніше</button>
+  </div>
+  <p class="mute" id="nov" hidden>Схоже, твій браузер не вміє озвучувати текст. Ось текст для читання:</p>
+  <p id="txt" class="mute" hidden></p>
+  <div class="q" id="q"></div>
+  <div id="opts"></div>
+  <div class="row"><button class="btn" id="next" disabled>Далі</button></div>
+</section>
+
+<section id="result" class="card" hidden>
+  <div class="mute">Твій результат</div>
+  <div class="score" id="sc"></div>
+  <div class="lvl" id="lv"></div>
+  <p id="msg"></p>
+  <p class="mute" id="split"></p>
+  <div class="row"><button class="ghost" id="again">Пройти ще раз</button></div>
+</section>
+</main>
+
+<script>
+var Q=[
+{t:"read",q:"I ___ coffee every morning.",o:["like","likes","liking"],a:0},
+{t:"read",q:"Yesterday we ___ to a new café.",o:["go","went","gone"],a:1},
+{t:"read",q:"If it rains tomorrow, I ___ at home.",o:["stay","will stay","would stayed"],a:1},
+{t:"read",q:"She has lived here ___ 2019.",o:["for","since","from"],a:1},
+{t:"read",q:"I wish I ___ more free time.",o:["have","had","will have"],a:1},
+{t:"listen",s:"Hi, I'm Anna. I work in a bookshop, and I love hiking on weekends.",q:"Where does Anna work?",o:["In a bank","In a bookshop","In a school"],a:1},
+{t:"listen",s:"The meeting is at half past four, but I might be a few minutes late.",q:"When is the meeting?",o:["4:30","5:30","4:00"],a:0},
+{t:"listen",s:"I used to play football, but now I prefer swimming because it's less stressful.",q:"What does the speaker prefer now?",o:["Football","Running","Swimming"],a:2},
+{t:"listen",s:"We were going to have dinner outside, but it started raining, so we ordered pizza at home.",q:"Why did they eat at home?",o:["It was raining","The pizza was cheap","They were tired"],a:0},
+{t:"listen",s:"I'd love to join you, but I have to finish a report first. Maybe I can come later if it's not too late.",q:"What does the speaker mean?",o:["They will definitely come","They don't want to come","They can't come now, but maybe later"],a:2}
+];
+var i=0,score=0,rs=0,ls=0,done=false,voice=null;
+var $=function(id){return document.getElementById(id)};
+var tts=("speechSynthesis" in window)&&("SpeechSynthesisUtterance" in window);
+
+function pickVoice(){
+  if(!tts)return;
+  var v=speechSynthesis.getVoices().filter(function(x){return /^en/i.test(x.lang)});
+  voice=v.filter(function(x){return /en-(US|GB)/i.test(x.lang)})[0]||v[0]||null;
+}
+if(tts){pickVoice();speechSynthesis.onvoiceschanged=pickVoice}
+
+function speak(text,rate){
+  if(!tts)return;
+  speechSynthesis.cancel();
+  var u=new SpeechSynthesisUtterance(text);
+  u.lang="en-US";if(voice)u.voice=voice;u.rate=rate;
+  speechSynthesis.speak(u);
+}
+
+function show(id){["start","quiz","result"].forEach(function(s){$(s).hidden=(s!==id)})}
+
+function render(){
+  var d=Q[i];done=false;
+  $("fill").style.width=(i/Q.length*100)+"%";
+  $("tag").textContent=(d.t==="read"?"📖 Читання":"🎧 Слухання")+" · "+(i+1)+" з "+Q.length;
+  $("listen").hidden=d.t!=="listen"||!tts;
+  $("nov").hidden=$("txt").hidden=!(d.t==="listen"&&!tts);
+  if(d.t==="listen"&&!tts)$("txt").textContent=d.s;
+  $("q").textContent=d.q;
+  $("next").disabled=true;
+  $("next").textContent=i===Q.length-1?"Показати результат":"Далі";
+  var box=$("opts");box.innerHTML="";
+  d.o.forEach(function(text,k){
+    var b=document.createElement("button");
+    b.className="opt";b.textContent=text;
+    b.onclick=function(){choose(k)};
+    box.appendChild(b);
+  });
+  if(d.t==="listen"&&tts)setTimeout(function(){speak(d.s,0.9)},300);
+}
+
+function choose(k){
+  if(done)return;done=true;
+  var d=Q[i],btns=$("opts").children;
+  for(var n=0;n<btns.length;n++){
+    btns[n].disabled=true;
+    if(n===d.a)btns[n].classList.add("ok");
+  }
+  if(k===d.a){score++;d.t==="read"?rs++:ls++}else btns[k].classList.add("bad");
+  $("next").disabled=false;
+}
+
+function finish(){
+  if(tts)speechSynthesis.cancel();
+  $("fill").style.width="100%";
+  show("result");
+  $("sc").textContent=score+" / 10";
+  var lv,msg;
+  if(score<=3){lv="A1–A2";msg="Ти на старті, і це абсолютно нормально. Speaking Club — якраз про те, щоб розмовляти без страху. Приходь, ми підлаштуємося 🫶"}
+  else if(score<=5){lv="A2";msg="Гарна база! Ти вже можеш підтримати просту розмову, а на клубі швидко розговоришся."}
+  else if(score<=7){lv="A2–B1";msg="Дуже добре! Ти впевнено почуваєшся в повсякденних розмовах. Це ідеальний рівень для нашого формату."}
+  else if(score<=9){lv="B1";msg="Круто! У тебе справді хороший рівень. Тобі буде легко і цікаво на клубі."}
+  else{lv="B1+";msg="Відмінний результат! Ти можеш бути тим, хто підтримує розмову в групі 😉"}
+  $("lv").textContent="Орієнтовний рівень: "+lv;
+  $("msg").textContent=msg;
+  $("split").textContent="Читання: "+rs+" з 5 · Слухання: "+ls+" з 5. Це короткий тест, тож результат орієнтовний, не офіційний.";
+}
+
+$("go").onclick=function(){i=0;score=rs=ls=0;show("quiz");render()};
+$("next").onclick=function(){i++;if(i>=Q.length)finish();else render()};
+$("play").onclick=function(){speak(Q[i].s,0.9)};
+$("slow").onclick=function(){speak(Q[i].s,0.6)};
+$("again").onclick=function(){show("start")};
+</script>
+</body>
+</html>
