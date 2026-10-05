@@ -44,7 +44,7 @@ button:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
 <section id="start" class="card">
   <h1>Quick English check 🎧</h1>
   <p>10 коротких питань: 5 на читання і 5 на слухання. Це не іспит і не EF SET — просто щоб побачити, де ти зараз, і підібрати комфортний формат для Speaking Club.</p>
-  <p class="mute">Займає ~5 хвилин. Для слухання ввімкни звук або одягни навушники. Помилки — наші друзі 🙂</p>
+  <p class="mute">Займає ~5 хвилин. Для слухання ввімкни звук або одягни навушники.</p>
   <button class="btn" id="go">Почати</button>
 </section>
 
@@ -74,17 +74,18 @@ button:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
 
 <script>
 var Q=[
-{t:"read",q:"I ___ coffee every morning.",o:["like","likes","liking"],a:0},
-{t:"read",q:"Yesterday we ___ to a new café.",o:["go","went","gone"],a:1},
-{t:"read",q:"If it rains tomorrow, I ___ at home.",o:["stay","will stay","would stayed"],a:1},
-{t:"read",q:"She has lived here ___ 2019.",o:["for","since","from"],a:1},
-{t:"read",q:"I wish I ___ more free time.",o:["have","had","will have"],a:1},
-{t:"listen",s:"Hi, I'm Anna. I work in a bookshop, and I love hiking on weekends.",q:"Where does Anna work?",o:["In a bank","In a bookshop","In a school"],a:1},
-{t:"listen",s:"The meeting is at half past four, but I might be a few minutes late.",q:"When is the meeting?",o:["4:30","5:30","4:00"],a:0},
-{t:"listen",s:"I used to play football, but now I prefer swimming because it's less stressful.",q:"What does the speaker prefer now?",o:["Football","Running","Swimming"],a:2},
-{t:"listen",s:"We were going to have dinner outside, but it started raining, so we ordered pizza at home.",q:"Why did they eat at home?",o:["It was raining","The pizza was cheap","They were tired"],a:0},
-{t:"listen",s:"I'd love to join you, but I have to finish a report first. Maybe I can come later if it's not too late.",q:"What does the speaker mean?",o:["They will definitely come","They don't want to come","They can't come now, but maybe later"],a:2}
+{t:"read",q:"I'm so tired. I ___ up at 5 a.m. because of my neighbour's rooster.",o:["woke","waked","have woke"],a:0},
+{t:"read",q:"Sorry I'm late! I ___ for a parking spot for twenty minutes.",o:["am looking","was looking","looking"],a:1},
+{t:"read",q:"I haven't seen Max ___ ages. Let's invite him!",o:["since","from","for"],a:2},
+{t:"read",q:"If I ___ the lottery, I would open a cat café.",o:["will win","won","win"],a:1},
+{t:"read",q:"I wish I ___ speak Italian. Then I could order pizza in Rome without pointing at the menu.",o:["can","could","will"],a:1},
+{t:"listen",s:"Honestly, I thought the film would be boring, but I couldn't stop laughing. I'm going to see it again with my sister next week.",q:"What did the speaker think of the film?",o:["It was boring, as expected","It was funnier than expected","It was too scary"],a:1},
+{t:"listen",s:"Sorry, I can't make it at six. Could we meet an hour later? I have to pick up my cousin from the airport.",q:"What time will they meet?",o:["At six","At five","At seven"],a:2},
+{t:"listen",s:"I used to hate mornings, but since I started running before work, I actually feel more awake. Now I can't imagine my day without it.",q:"What does the speaker say about mornings now?",o:["They still hate them","Running has made them easier","They run after work"],a:1},
+{t:"listen",s:"We were going to have a picnic, but the forecast said heavy rain. So we stayed at home and watched three films in a row.",q:"Why didn't they go on the picnic?",o:["They were tired after the films","Nobody had time","The weather was going to be bad"],a:2},
+{t:"listen",s:"I'd love to come, but I'm swamped with work this week. Ask me again on Friday. I might have a free evening by then.",q:"What does the speaker mean?",o:["They don't want to come at all","They're too busy now, but may be free later","They will definitely come on Friday"],a:1}
 ];
+
 var i=0,score=0,rs=0,ls=0,done=false,voice=null;
 var $=function(id){return document.getElementById(id)};
 var tts=("speechSynthesis" in window)&&("SpeechSynthesisUtterance" in window);
@@ -143,8 +144,8 @@ function finish(){
   show("result");
   $("sc").textContent=score+" / 10";
   var lv,msg;
-  if(score<=3){lv="A1–A2";msg="Ти на старті, і це абсолютно нормально. Speaking Club — якраз про те, щоб розмовляти без страху. Приходь, ми підлаштуємося 🫶"}
-  else if(score<=5){lv="A2";msg="Гарна база! Ти вже можеш підтримати просту розмову, а на клубі швидко розговоришся."}
+  if(score<=3){lv="A1–A2";msg="Дякую, що пройшов/пройшла тест 🫶 Схоже, що поки цей формат може бути для тебе складним: розмови швидкі, групи маленькі, і легко відчути себе загубленим. Тому, мабуть, краще ще трохи потренуватися й прийти наступного разу. Це зовсім не про «погано»: просто хочеться, щоб тобі було комфортно і весело на такому вечорі."}
+  else if(score<=5){lv="A2";msg="Гарна база, ти молодець! Але на клубі розмови живі й швидкі, тож зараз тобі може бути досить складно. Мабуть, краще ще трохи потренуватися й приєднатися наступного разу: тоді ти отримаєш від вечора набагато більше 🫶"}
   else if(score<=7){lv="A2–B1";msg="Дуже добре! Ти впевнено почуваєшся в повсякденних розмовах. Це ідеальний рівень для нашого формату."}
   else if(score<=9){lv="B1";msg="Круто! У тебе справді хороший рівень. Тобі буде легко і цікаво на клубі."}
   else{lv="B1+";msg="Відмінний результат! Ти можеш бути тим, хто підтримує розмову в групі 😉"}
